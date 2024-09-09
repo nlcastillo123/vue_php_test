@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD PHP VUE JS</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="app.css">
+
+
+</head>
+
+<body>
+    <div id="app">
+        <p v-if="message">{{message}}</p>
+        <button @click="modalCreate=true">Create</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NOMBRE</th>
+                    <th>EMAIL</th>
+                    <th>FOTO</th>
+                    <th>ACCION</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="user in users" :key="user.id">
+                    <td>{{user.id_usuario}}</td>
+                    <td>{{user.nombre}}</td>
+                    <td>{{user.email}}</td>
+                    <td>
+                        <img :src="`img/${user.image}`" width="200">
+                    </td>
+
+                    <td>{{user.image}}</td>
+                    <td>
+                        <button>Edit</button>
+                        <button>Del</button>
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- CRETE -->
+        <div class="contenedor" v-if="modalCreate">
+            <div class="modal">
+                <input type="text" name="name" id="name" placeholder="INGRESE SU NOMBRE"><br>
+                <input type="email" name="email" id="email" placeholder="INGRESE SU CORREO"><br>
+                <input type="file" name="image" id="image"><br>
+                <button @click="modalCreate=false;insertUser()">Guardar</button>
+                <button @click="modalCreate=false">Cancelar</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+
+</html>
