@@ -1,78 +1,89 @@
 <?php
-class DBManager
-{
+class DBManager {
     private $host = 'localhost';
-    private $usuario = 'root';
-    private $clave = 'edutek';
-    private $db = 'productos';
-    private $conexion;
+    private $usuario = 'sa';
+    private $clave = 'Guate2024';
+    private $db = 'prueba_db';
+    private $conexion = null;
 
     public function __construct()
     {
         $this->conectar();
     }
 
-    public function conectar()
+    private function conectar()
     {
-        $this->conexion = new mysqli($this->host, $this->usuario, $this->clave, $this->db); //
-        if (!$this->conexion) {
-            die('Fallo la conexion: ' . $this->conexion->connect_error);
+        try {
+            $dsn = "sqlsrv:Server={$this->host};Database={$this->db}";
+            $this->conexion = new PDO($dsn, $this->usuario, $this->clave);
+            $this->conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo ("Connection failed: " . $e->getMessage());
         }
     }
 
-    public function desconectar()
+    public function getConnection()
     {
-        if ($this->conexion) {
-            $this->conexion->close();
-        }
+        return $this->conexion;
     }
 
-    //INSERT
-    public function insert($table, $nombre, $email, $image)
+    public function disconnect()
     {
-        $sentencia = $this->conexion->prepare("INSERT INTO $table(nombre, email, image) VALUES(?,?,?)");
-        $sentencia->bind_param('sss', $nombre, $email, $image);
-
-        if ($sentencia->execute()) {
-            return $sentencia->insert_id;
-        } else {
-            die("Error al insertar: $sentencia->error");
-        }
-    }
-    //UPDATE
-    public function update($id_usuario, $nombre, $email, $image)
-    {
-        $stmt = $this->conexion->prepare("UPDATE usuarios SET nombre = ?, email = ?, image = ? WHERE id_usuario = ?");
-        $stmt->bind_param("sssi", $nombre, $email, $image, $id_usuario);
-
-        if ($stmt->execute()) {
-            return true;
-        } else {
-            die("Error updating record: $stmt->error");
-        }
+        $this->conexion = null;
     }
 
-    //DELETE
-    public function delete($id_usuario)
+    // Insert a new record into the usuarios table
+    public function insertUser($nombre, $email, $imagen)
     {
-        $stmt = $this->conexion->prepare("DELETE FROM usuarios WHERE id_usuario = ?");
-        $stmt->bind_param("i", $id_usuario);
-
-        if ($stmt->execute()) {
-            return true;
-        } else {
-            die("Error deleting record: $stmt->error");
-        }
+        $sql = "INSERT INTO usuarios (nombre, email, imagen) VALUES (:nombre, :email, :imagen)";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':imagen', $imagen);
+        return $stmt->execute();
     }
 
-    //SEARCH
-    public function search($table, $condicion)
+    // Update an existing record in the usuarios table
+    public function updateUser($id_usuario, $nombre, $email, $imagen)
     {
-        $result = $this->conexion->query("SELECT * FROM $table WHERE $condicion")
-            or die($this->conexion->error);
-        if ($result) {
-            return $result->fetch_all(MYSQLI_ASSOC);
-        }
-        return false;
+        $sql = "UPDATE usuarios SET nombre = :nombre, email = :email, imagen = :imagen WHERE id_usuario = :id_usuario";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':id_usuario', $id_usuario);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':imagen', $imagen);
+        return $stmt->execute();
+    }
+
+    // Delete a record from the usuarios table
+    public function deleteUser($id_usuario)
+    {
+        $sql = "DELETE FROM usuarios WHERE id_usuario = :id_usuario";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':id_usuario', $id_usuario);
+        return $stmt->execute();
+    }
+
+    // Retrieve a single record from the usuarios table
+    public function getUser($id_usuario)
+    {
+        $this->conectar();
+        $sql = "SELECT * FROM usuarios WHERE id_usuario = :id_usuario";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':id_usuario', $id_usuario);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Retrieve all records from the usuarios table
+    public function getAllUsers()
+    {
+        $this->conectar();
+        $sql = "SELECT * FROM usuarios";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute();
+        $this->disconnect();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     }
 }

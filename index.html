@@ -32,30 +32,55 @@
                     <td>{{user.nombre}}</td>
                     <td>{{user.email}}</td>
                     <td>
-                        <img :src="`img/${user.image}`" width="200">
+                        <img :src="`img/${user.imagen}`" width="200">
                     </td>
 
-                    <td>{{user.image}}</td>
+                    <td>{{user.imagen}}</td>
                     <td>
-                        <button>Edit</button>
-                        <button>Del</button>
+                        <button @click="modalUpdate=true; selectUser(user)">Edit</button>
+                        <button @click="modalDel=true; selectUser(user)">Del</button>
 
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- CRETE -->
+        <!-- CREATE -->
         <div class="contenedor" v-if="modalCreate">
             <div class="modal">
-                <input type="text" name="name" id="name" placeholder="INGRESE SU NOMBRE"><br>
-                <input type="email" name="email" id="email" placeholder="INGRESE SU CORREO"><br>
-                <input type="file" name="image" id="image"><br>
+                <input type="text" name="name" id="name" placeholder="INGRESE SU NOMBRE" /><br />
+                <input type="email" name="email" id="email" placeholder="INGRESE SU CORREO" /><br />
+                <input type="file" name="image" id="imagen" /><br />
                 <button @click="modalCreate=false;insertUser()">Guardar</button>
                 <button @click="modalCreate=false">Cancelar</button>
             </div>
 
         </div>
+        <!--   -->
+        <!-- UPDATE -->
+        <div class="contenedor" v-if="modalUpdate">
+            <div class="modal">
+                <input type="text" name="nameUpdate" id="nameUpdate" v-model="currentUser.nombre" /><br />
+                <input type="email" name="emailUpdate" id="emailUpdate" v-model="currentUser.email" /><br />
+                <input type="file" name="imagenUpdate" id="imagenUpdate" /><br />
+                <button @click="modalUpdate=false;updateUser()">Actualizar</button>
+                <button @click="modalUpdate=false">Cancelar</button>
+            </div>
+
+        </div>
+        <!--   -->
+        <!-- DELETE -->
+        <div class="contenedor" v-if="modalDel">
+            <div class="modal">
+                <input type="text" name="nameUpdate" id="nameUpdate" v-model="currentUser.nombre" /><br />
+                <input type="email" name="emailUpdate" id="emailUpdate" v-model="currentUser.email" /><br />
+                <input type="file" name="imagenUpdate" id="imagenUpdate" /><br />
+                <button @click="modalDel=false;deleteUser()">Borrar</button>
+                <button @click="modalDel=false">Cancelar</button>
+            </div>
+
+        </div>
+        <!--   -->
     </div>
 
     <script src="app.js"></script>
